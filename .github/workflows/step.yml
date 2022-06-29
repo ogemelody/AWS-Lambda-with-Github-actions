@@ -1,0 +1,23 @@
+name: Lambda Functions
+on:
+  push:
+    branches: [ main]
+
+jobs:
+  release:
+    name: Deploy lambda function
+    runs-on: [ ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: AKIA2FLDO5XMFXLHSG4Q
+        aws-secret-access-key: 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
+        aws-region: us-east-1
+    - name: zip Lambda Function
+      run: |
+        zip -r9 lambda.zip . send.py
+    - name: AWS Deploy
+      run: |
+        aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
