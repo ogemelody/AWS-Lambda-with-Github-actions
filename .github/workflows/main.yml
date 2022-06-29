@@ -19,7 +19,7 @@ jobs:
         role-session-name: lambda-role-for-s3-cw-rds
     - name: zip Lambda Function
       run: |
-        zip -r9 lambda.zip . -i sample.py
+        zip -r9 lambda.zip . -i send.py
     - name: AWS Deploy
       run: |
-        aws lambda update-function-code --function-name NameOfLambdaFunction --zip-file fileb://lambda.zip
+        aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
