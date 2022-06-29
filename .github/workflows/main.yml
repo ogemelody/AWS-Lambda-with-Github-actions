@@ -15,8 +15,6 @@ jobs:
         aws-access-key-id: AKIA2FLDO5XMFXLHSG4Q
         aws-secret-access-key: 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
         aws-region: us-east-1
-        role-duration-seconds: 3600
-        role-session-name: lambda-role-for-s3-cw-rds
     - name: zip Lambda Function
       run: |
         zip -r9 lambda.zip . send.py
