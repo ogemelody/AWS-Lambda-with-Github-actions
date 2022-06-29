@@ -13,8 +13,9 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: AKIA2FLDO5XMDGNLU663
-        aws-secret-access-key: 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
+        aws-access-key-id: AKIA2FLDO5XMGTKU3YFZ
+        aws-secret-access-key: 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
+
         aws-region: us-east-1
     - name: zip Lambda Function
       run: |
