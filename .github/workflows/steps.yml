@@ -16,7 +16,7 @@ jobs:
         aws-secret-access-key: THBM8fntXJNoIMeq/PCddv6NBhYTlY17MDgLWUsd
 
         aws-region: us-east-1
-    - name: zip Lambda Function
+    - name: zip Lambda Functions
       run: |
         zip -r9 lambda.zip . try.py
     - name: AWS Deploy
