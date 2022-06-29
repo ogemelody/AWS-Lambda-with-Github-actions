@@ -12,12 +12,13 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: AKIA2FLDO5XMFXLHSG4Q
-        aws-secret-access-key: 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
+        aws-access-key-id: AKIA2FLDO5XMDGNLU663
+        aws-secret-access-key: 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
+
         aws-region: us-east-1
     - name: zip Lambda Function
       run: |
-        zip -r9 lambda.zip . send.py
+        zip -r9 lambda.zip . try.py
     - name: AWS Deploy
       run: |
         aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
