@@ -1,25 +1,99 @@
 name: Deploy Lambda Functions
 on:
   push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+      
    
-    branches-ignore: main
+    #branches-ignore: main
 
 jobs:
-  release:
-    name: Deploy lambda function
-    runs-on: [ ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id:  ${{secrets.AWS_ACCESS_KEY_ID}}
-        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+    build:
+      runs-on: ubuntu-latest
+      
+      steps:
+        - uses: actions/checkout@v2
+        - name: Set up python
+          uses: actions/setup-python@v2
+          with:
+            python-version: '3.9'
+          
+        - name: Create and start virtual environment
+          run: |
+            python -m venv venv
+            source venv/bin/activate
+            
+        - name: Install dependencies
+          run: pip install -r requirements.txt
+        
+        - name: Test with Unittest
+          run: python -m unittest tests/test.py
+    
+    docker:
+      
+      runs-on: ubuntu-latest
+      steps:
+        - name: checkout node
+          uses: actions/checkout@v3
+     # docker
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v2
+      
+        - name: Login to DockerHub
+          uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME}}
+            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        - name: build docker image
+          run: docker build -t my-image-melody:$(date +%s)
+        
+    aws_ECR:
+      runs-on: ubuntu-latest
+      steps:
+        - name: checkout
+          uses: actions/checkout@v3
+      
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1
+        
+        
+        - name: Log into AWS ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+      
+        - name: build, tag, and push image to Amazon ECR
+          env:
+            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry}}
+            ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}
+            IMAGE_TAG: ${{github.sha}}-latest
+          run: |
+            docker  build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
+        - name: Log out of AWS ECR
+          if: always()
+          run: docker logout ${{steps.login-ecr.outputs.registry}}
+    
+    deploy:
+      name: Deploy lambda function
+      runs-on: [ ubuntu-latest]
+      steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
-        aws-region: us-east-1
-    - name: zip Lambda Function
-      run: |
-        zip -r9 lambda.zip . send.py
-    - name: AWS Deploy
-      run: |
-        aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
+          aws-region: us-east-1
+      - name: zip Lambda Function
+        run: |
+          zip -r9 lambda.zip . main.py
+      - name: AWS Deploy
+        run: |
+          aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
