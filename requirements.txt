@@ -1,0 +1,3 @@
+unittest2==3.2
+pathlib==0.97
+genson==1.2.2
