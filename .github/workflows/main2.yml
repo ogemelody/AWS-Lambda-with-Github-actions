@@ -1,4 +1,4 @@
-name: Deploy Lambda Functions
+name: Bulid test and deploy to Dockerhub, ECR AND Lambda
 on:
   push:
     branches: [master]
