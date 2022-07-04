@@ -9,6 +9,6 @@ RUN apt-get update
 
 
 #Run the application:
-COPY datascripts.py .
+COPY main.py .
 ENTRYPOINT ["python"]
 CMD  ["main.py"]
