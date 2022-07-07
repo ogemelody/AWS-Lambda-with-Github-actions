@@ -42,10 +42,10 @@ jobs:
           python-version: 3.9
       # poetry
       - name: Test with Unittest
-        run: python -m unittest test.py
+        run: pip install -r requirements.txt unittest2 && python -m unittest test.py
     
     docker:
-      
+      needs: [build, test]
       runs-on: ubuntu-latest
       steps:
         - name: checkout node
@@ -63,6 +63,7 @@ jobs:
           run: docker build -t my-image-melody:$(date +%s) .
         
     aws_ECR:
+      needs: [build, test]
       runs-on: ubuntu-latest
       steps:
         - name: checkout
@@ -94,6 +95,7 @@ jobs:
           run: docker logout ${{steps.login-ecr.outputs.registry}}
     
     deploy:
+      needs: [build, test]
       name: Deploy lambda function
       runs-on: [ ubuntu-latest]
       steps:
@@ -107,7 +109,7 @@ jobs:
           aws-region: us-east-1
       - name: zip Lambda Function
         run: |
-          zip -r9 lambda.zip . main.py
+          zip -r9 lambda.zip . lambda_function.py
       - name: AWS Deploy
         run: |
           aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
