@@ -26,9 +26,23 @@ jobs:
             
         - name: Install dependencies
           run: pip install -r requirements.txt unittest2
-        
-        - name: Test with Unittest
-          run: python -m unittest test.py
+    test:
+      needs: [build]
+      runs-on: ubuntu-latest
+      steps:
+      
+      - name: checkout node
+        uses: actions/checkout@v3
+      
+      # python
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      # poetry
+      - name: Test with Unittest
+        run: python -m unittest test.py
     
     docker:
       
@@ -46,7 +60,7 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME}}
             password: ${{ secrets.DOCKERHUB_PASSWORD }}
         - name: build docker image
-          run: docker build -t my-image-melody:$(date +%s) .
+          run: docker build -t my-image-melody:$(latest) .
         
     aws_ECR:
       runs-on: ubuntu-latest
