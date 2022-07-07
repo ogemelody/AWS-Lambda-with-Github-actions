@@ -60,7 +60,7 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME}}
             password: ${{ secrets.DOCKERHUB_PASSWORD }}
         - name: build docker image
-          run: docker build -t my-image-melody:$(latest) .
+          run: docker build -t my-image-melody:$(date +%s) .
         
     aws_ECR:
       runs-on: ubuntu-latest
