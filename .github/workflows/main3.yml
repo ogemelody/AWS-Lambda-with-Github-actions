@@ -109,7 +109,7 @@ jobs:
           aws-region: us-east-1
       - name: zip Lambda Function
         run: |
-          zip -r9 lambda.zip . lambda_function.py
+          zip -r9 lambda.zip . main.py
       - name: AWS Deploy
         run: |
           aws lambda update-function-code --function-name deploy-sample --zip-file fileb://lambda.zip
